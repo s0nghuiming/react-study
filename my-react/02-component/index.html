@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>React Component</title>
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="../build/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <div id="root2"></div>
+    <script type="text/babel">
+    // ** Our code goes here! **
+    function Welcome(props) {
+        return <h1>Hello, {props.name}</h1>;
+    }
+    class Welcome2 extends React.Component {
+        render() {
+            return <h1> Hello, {this.props.name}.</h1>;
+        }
+    }
+    const element = <Welcome name="Sara" />;
+    ReactDOM.render(
+        element,
+        document.getElementById('root')
+    );
+    </script>
+</body>
+</html>

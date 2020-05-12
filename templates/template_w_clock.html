@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title>Stateful clock</title>
+      <script src="../build/react.development.js"></script>
+      <script src="../build/react-dom.development.js"></script>
+      <script src="../build/babel.min.js"></script>
+      <style type="text/css">
+      body {
+          background-color: black;
+          color: white
+      }
+      div.clock {
+          position: fixed;
+          border: 3px solid #73AD21;
+          height: 20px;
+          width: 200px;
+          bottom: 0;
+          right: 0;
+          color: white;
+          text-align: left;
+      }
+      </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class Clock extends React.Component {
+            constructor(props) {
+                super(props);
+                this.toggleTickOn = this.toggleTickOn.bind(this);
+                this.message = " (paused)";
+                //this.updateFlag = true;
+                this.state = {
+                    date: new Date(),
+                    isTickOn: true,
+                };
+            }
+
+            componentDidMount() {
+                this.timerID = setInterval( () => this.tick(), 1000 );
+            }
+
+            componentWillUnmount() {
+                clearInterval(this.timerID);
+            }
+
+            tick() {
+                this.setState({date: new Date()});
+            }
+
+            toggleTickOn() {
+                this.setState(state => ({
+                    isTickOn: ! state.isTickOn
+                }));
+                if ( this.state.isTickOn ) {
+                    console.log('Set clock on.');
+                    if ( ! this.timerID ) {
+                        this.timerID = setInterval( () => this.tick(), 1000 );
+                    } else {
+                        // Do nothing because clock is on.
+                    }
+                } else if ( ! this.state.isTickOn ) {
+                    console.log('Set clock off.');
+                    if ( ! this.timerID ) {
+                        // Do nothing because clock is off.
+                    } else {
+                        clearInterval(this.timerID);
+                        this.timerID = NaN;
+                    }
+                }
+            }
+
+            render() {
+                return (
+                    <div className="clock" onClick={this.toggleTickOn}>
+                    It is {
+                        this.state.date.toLocaleTimeString() +
+                        (this.timerID ? '' : this.message)
+                    }.
+                    </div>
+                );
+            }
+        }
+
+        function App() {
+            return (
+                <Clock />
+            )
+        }
+        ReactDOM.render(
+          <App />,
+          document.getElementById('root')
+        );
+        //// Delaying can't avoid 'paused' show in startup.
+        // setTimeout(function() {
+        //   ReactDOM.render(<App />, document.getElementById('root'));
+        // }, 2000);
+    </script>
+</body>
+</html>

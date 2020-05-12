@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>React Props are R/O, right?</title>
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="../build/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+    // ** Our code goes here! **
+    function sum(a, b) {
+        return a + b;
+    }
+    function withDraw(a, b) {
+        return a - b;
+    }
+    const element = sum(1,2);
+    ReactDOM.render(
+        element,
+        document.getElementById('root')
+    );
+    </script>
+</body>
+</html>

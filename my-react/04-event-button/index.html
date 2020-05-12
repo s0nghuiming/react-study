@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+      <meta charset="UTF-8" />
+      <title>Stateful clock with button event</title>
+      <script src="../build/react.development.js"></script>
+      <script src="../build/react-dom.development.js"></script>
+      <script src="../build/babel.min.js"></script>
+      <style type="text/css">
+      body {
+          background-color: black;
+          color: white
+      }
+      </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        class Clock extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    date: new Date()
+                };
+            }
+
+            componentDidMount() {
+                this.timerID = setInterval(
+                    () => this.tick(),
+                    1000
+                );
+            }
+
+            componentWillUnmount() {
+                clearInterval(this.timerID);
+            }
+
+            tick() {
+                this.setState({date: new Date()});
+            }
+
+            render() {
+                return (
+                    <div>
+                    <h1>Hello, folks!</h1>
+                    <h2>It is {this.state.date.toLocaleTimeString()}.</h2>
+                    </div>
+                );
+            }
+        }
+
+        class Toggle extends React.Component {
+          constructor(props) {
+            super(props);
+            this.state = {isToggleOn: true};
+
+            // This binding is necessary to make `this` work in the callback
+            this.handleClick = this.handleClick.bind(this);
+          }
+
+          handleClick() {
+            this.setState(state => ({
+              isToggleOn: !state.isToggleOn
+            }));
+          }
+
+          render() {
+            return (
+              <button onClick={this.handleClick}>
+                {this.state.isToggleOn ? 'ON' : 'OFF'}
+              </button>
+            );
+          }
+        }
+
+        function App() {
+            return (
+                <div>
+                    <Clock />
+                    <Toggle />
+                </div>
+            )
+        }
+
+        ReactDOM.render(
+          <App />,
+          document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
