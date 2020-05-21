@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <script src="../build/react.development.js"></script>
+    <script src="../build/react-dom.development.js"></script>
+    <!-- Don't use this in production: -->
+    <script src="../build/babel.min.js"></script>
+    <style type="text/css">
+    body {
+        background-color: black;
+        color: white;
+        padding: 5px
+    }
+    div.FilterableProductTable {
+      position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        border: 2px solid #FFE701;
+        height: 400px;
+        width: 250px;
+        right: 0;
+        color: white;
+        text-align: left;
+    }
+    div.SearchBar {
+        top: 0;
+        border: 2px solid #0080ff;
+        height: 60px;
+        right: 0;
+        color: white;
+        text-align: left;
+        padding: 5px
+    }
+    div.ProductTable {
+        top: 0;
+        border: 2px solid #00ff00;
+        height: 312px;
+        right: 0;
+        color: white;
+        text-align: center;
+        padding: 5px
+    }
+    table.ProductTable {
+        top: 0;
+        bottom: 0;
+        left: 0
+        right: 0;
+        color: white;
+        text-align: center;
+    }
+    th.ProductCategoryRow {
+        top: 0;
+        border-bottom: 1px solid #00ffff;
+        height: 20px;
+        right: 0;
+        color: white;
+        text-align: center;
+    }
+    td.ProductRow {
+        top: 0;
+        border-bottom: 1px solid #ffff00;
+        height: 20px;
+        right: 0;
+        color: white;
+        text-align: center;
+    }
+    </style>
+</head>
+<body>
+  <div id='root'>
+    <!-- <div class='FilterableProductTable'>
+      <div class='SearchBar'>
+      </div>
+      <div class='ProductTable'>
+        <div class='ProductCategoryRow'>
+        </div>
+        <div class='ProductRow'>
+        </div>
+      </div>
+    </div> -->
+  </div>
+  <script type="text/babel">
+  // ** Our code goes here! **
+  var prodString = '[{"category": "Sporting Goods", "price": "$49.99", "stocked": true, "name": "Football"},{"category": "Sporting Goods", "price": "$9.99", "stocked": true, "name": "Baseball"},{"category": "Sporting Goods", "price": "$29.99", "stocked": false, "name": "Basketball"},{"category": "Electronics", "price": "$99.99", "stocked": true, "name": "iPod Touch"},{"category": "Electronics", "price": "$399.99", "stocked": false, "name": "iPhone 5"},{"category": "Electronics", "price": "$199.99", "stocked": true, "name": "Nexus 7"}]';
+  var PRODUCTS = JSON.parse(prodString);
+
+
+  class ProductCategoryRow extends React.Component {
+    render() {
+      const category = this.props.category;
+
+      return (
+        <tr>
+          <th className='ProductCategoryRow' colSpan="2">
+            {category}
+          </th>
+        </tr>
+      );
+    }
+  }
+
+  class ProductRow extends React.Component {
+    render() {
+      const product = this.props.product;
+      const name = product.stocked ?
+        product.name :
+        <span style={{color: 'red'}}>
+          {product.name}
+        </span>;
+
+      return (
+        <tr>
+          <td className='ProductRow'>{name}</td>
+          <td className='ProductRow'>{product.price}</td>
+        </tr>
+      );
+    }
+  }
+
+  class ProductTable extends React.Component {
+    render() {
+      const filterText = this.props.filterText;
+      const inStockOnly = this.props.inStockOnly;
+
+      const rows = [];
+      let lastCategory = null;
+
+      this.props.products.forEach((product) => {
+        if (product.name.indexOf(filterText) === -1) {
+          return;
+        }
+        if (inStockOnly && ! product.stocked) {
+          return;
+        }
+        if (product.category !== lastCategory) {
+          rows.push(
+            <ProductCategoryRow
+              category={product.category}
+              key={product.category} />
+          );
+        }
+        rows.push(
+          <ProductRow
+            product={product}
+            key={product.name}/>
+        )
+        lastCategory = product.category;
+      });
+
+      return (
+        <div className='ProductTable'>
+        <table className='ProductTable'>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows}
+          </tbody>
+        </table>
+        </div>
+      );
+    }
+  }
+
+  class SearchBar extends React.Component {
+    constructor(props) {
+      super(props);
+      this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
+      this.handleInStockChange = this.handleInStockChange.bind(this);
+    }
+
+    handleFilterTextChange(e) {
+      this.props.onFilterTextChange(e.target.value);
+    }
+
+    handleInStockChange(e) {
+      this.props.onInStockChange(e.target.checked);
+    }
+
+    render() {
+      const filterText = this.props.filterText;
+      const inStockOnly = this.props.inStockOnly;
+
+      return (
+        <div className='SearchBar'>
+        <form>
+          <input
+            type="text"
+            placeholder="Search..."
+            value={filterText}
+            onChange={this.handleFilterTextChange}
+          />
+          <p>
+            <input
+              type="checkbox"
+              checked={inStockOnly}
+              onChange={this.handleInStockChange}
+            />
+            Only show products in stock
+          </p>
+        </form>
+        </div>
+      );
+    }
+  }
+
+  class FilterableProductTable extends React.Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        filterText: '',
+        inStockOnly: false
+      };
+      this.handleFilterTextChange = this.handleFilterTextChange.bind(this);
+      this.handleInStockChange = this.handleInStockChange.bind(this);
+    }
+
+    handleFilterTextChange(filterText) {
+      this.setState({
+        'filterText': filterText
+      })
+    }
+
+    handleInStockChange(inStockOnly) {
+      this.setState({
+        'inStockOnly': inStockOnly
+      })
+    }
+
+    render() {
+      return (
+        <div className="FilterableProductTable">
+          <SearchBar
+            filterText={this.state.filterText}
+            inStockOnly={this.state.inStockOnly}
+            onFilterTextChange={this.handleFilterTextChange}
+            onInStockChange={this.handleInStockChange}
+          />
+          <ProductTable
+            products={this.props.products}
+            filterText={this.state.filterText}
+            inStockOnly={this.state.inStockOnly}
+          />
+        </div>
+      );
+    }
+  }
+
+
+  ReactDOM.render(
+    <FilterableProductTable products={PRODUCTS} />,
+    document.getElementById('root')
+  );
+  </script>
+</body>
+</html>
